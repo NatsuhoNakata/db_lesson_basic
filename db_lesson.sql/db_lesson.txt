@@ -1,0 +1,344 @@
+Q1 新しいテーブルの追加
+mysql> CREATE TABLE departments (
+    -> department_id INT unsigned auto_increment PRIMARY KEY,
+    -> name VARCHAR(20) not null,
+    -> created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -> updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    -> );
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> desc departments;
++---------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| Field         | Type         | Null | Key | Default           | Extra                                         |
++---------------+--------------+------+-----+-------------------+-----------------------------------------------+
+| department_id | int unsigned | NO   | PRI | NULL              | auto_increment                                |
+| name          | varchar(20)  | NO   |     | NULL              |                                               |
+| created_at    | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| updated_at    | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++---------------+--------------+------+-----+-------------------+-----------------------------------------------+
+4 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q2　peopleテーブルに新しいカラムを追加
+mysql> alter table people add departments_id INT unsigned after email;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc people;
++----------------+------------------+------+-----+-------------------+-----------------------------------------------+
+| Field          | Type             | Null | Key | Default           | Extra                                         |
++----------------+------------------+------+-----+-------------------+-----------------------------------------------+
+| person_id      | int unsigned     | NO   | PRI | NULL              | auto_increment                                |
+| name           | varchar(20)      | NO   |     | NULL              |                                               |
+| email          | varchar(255)     | YES  | UNI | NULL              |                                               |
+| departments_id | int unsigned     | YES  |     | NULL              |                                               |
+| age            | tinyint unsigned | YES  |     | NULL              |                                               |
+| gender         | tinyint          | YES  |     | NULL              |                                               |
+| created_at     | timestamp        | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| updated_at     | timestamp        | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++----------------+------------------+------+-----+-------------------+-----------------------------------------------+
+8 rows in set (0.01 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q3、Q4 departments,people,reportsテーブルに必要なレコードを追加し、departments_idのNULLに部署IDを割り振り、結合。
+＊営業、開発、経理、人事、情報システムの追加（departments）
+mysql> insert into departments (name)
+    -> values
+    -> ('sales'),
+    -> ('development'),
+    -> ('accounting'),
+    -> ('human resources'),
+    -> ('information system');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql>  select * from departments;
++---------------+--------------------+---------------------+---------------------+
+| department_id | name               | created_at          | updated_at          |
++---------------+--------------------+---------------------+---------------------+
+|             1 | sales              | 2025-05-26 20:44:48 | 2025-05-26 20:44:48 |
+|             2 | development        | 2025-05-26 20:44:48 | 2025-05-26 20:44:48 |
+|             3 | accounting         | 2025-05-26 20:44:48 | 2025-05-26 20:44:48 |
+|             4 | human resources    | 2025-05-26 20:44:48 | 2025-05-26 20:44:48 |
+|             5 | information system | 2025-05-26 20:44:48 | 2025-05-26 20:44:48 |
++---------------+--------------------+---------------------+---------------------+
+5 rows in set (0.00 sec)
+
+
+＊10人構成にするために、既にあるメンバーに5人追加。(people)
+mysql> insert into people (name,email,age,gender)
+    -> values
+    -> ('佐藤としえ','sato@gizumo.jp',35,2),
+    -> ('小林としこ','kobayashi@gizumo.jp',24,2),
+    -> ('大森たつお','omori@gizumo.jp',45,1),
+    -> ('柳沢だいご','yanagisawa@gizumo.jp',56,1),
+    -> ('大塚たく','otsuka@gizumo.jp',50,1);
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+＊10件の日報を追加（reports）
+!途中でperson_idの値を修正しています!
+mysql> update reports set content = '10時から打ち合わせ'where person_id=1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '報告書の提出'where person_id=2;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = 'メールの一斉送信'where person_id=3;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '15時からWEB面接'where person_id=4;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '11時から部課長会議'where person_id=5;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '履歴書のファイリング'where person_id=6;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '源泉徴収票の発送'where person_id=7;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '請求書の作成'where person_id=8;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = ''where person_id=9;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set content = '消毒液の交換'where person_id=1001;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set person_id = '11' where person_id = 4;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set report_id = '11' where person_id = 11;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update reports set person_id = '10' where person_id = 10;
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> update reports set person_id = '10' where person_id = 1001;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from reports;
++-----------+-----------+--------------------------------+---------------------+---------------------+
+| report_id | person_id | content                        | created_at          | updated_at          |
++-----------+-----------+--------------------------------+---------------------+---------------------+
+|         1 |         1 | 10時から打ち合わせ             | 2025-05-25 18:59:12 | 2025-05-26 21:40:26 |
+|         2 |         2 | 報告書の提出                   | 2025-05-25 18:59:12 | 2025-05-26 21:41:15 |
+|         3 |         3 | メールの一斉送信               | 2025-05-25 19:14:02 | 2025-05-26 21:42:02 |
+|         5 |         5 | 11時から部課長会議             | 2025-05-25 19:31:51 | 2025-05-26 21:43:36 |
+|         6 |         6 | 履歴書のファイリング           | 2025-05-25 19:31:51 | 2025-05-26 21:49:15 |
+|         7 |         7 | 源泉徴収票の発送               | 2025-05-25 19:31:51 | 2025-05-26 21:49:55 |
+|         8 |         8 | 請求書の作成                   | 2025-05-25 19:31:51 | 2025-05-26 21:50:33 |
+|         9 |         9 |                                | 2025-05-25 19:31:51 | 2025-05-26 21:51:19 |
+|        10 |        10 | 消毒液の交換                   | 2025-05-25 19:31:51 | 2025-05-28 21:32:25 |
+|        11 |        11 | 15時からWEB面接                | 2025-05-25 19:14:02 | 2025-05-28 21:30:57 |
++-----------+-----------+--------------------------------+---------------------+---------------------+
+10 rows in set (0.00 sec)
+
+
+＊departments_idのNULLに部署のIDを割り振る。
+営業＝1、開発＝2、経理＝3、人事＝4、人事＝5
+mysql> update people set departments_id = '1' where person_id = 1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '1' where person_id = 2;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '1' where person_id = 3;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '2' where person_id = 5;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '2' where person_id = 6;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '2' where person_id = 7;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '2' where person_id = 8;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '3' where person_id = 9;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '4' where person_id = 10;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update people set departments_id = '5' where person_id = 11;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from people;
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+
+| person_id | name                  | email                | departments_id | age  | gender | created_at          | updated_at          |
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+
+|         1 | 田中ゆうこ            | tanaka@gizumo.jp     |              1 |   25 |      2 | 2025-05-25 15:33:52 | 2025-05-28 20:54:01 |
+|         2 | 福田だいすけ          | fukuda@gizumo.jp     |              1 |   42 |      1 | 2025-05-25 15:33:52 | 2025-05-28 21:07:19 |
+|         3 | 豊島はなこ            | toyoshima@gizumo.jp  |              1 |   34 |      2 | 2025-05-25 15:33:52 | 2025-05-28 21:07:47 |
+|         5 | 不思議沢みちこ        | NULL                 |              2 | NULL |   NULL | 2025-05-25 15:33:52 | 2025-05-28 21:11:47 |
+|         6 | 鈴木たかし            | suzuki@gizumo.jp     |              2 |   20 |      1 | 2025-05-25 16:00:17 | 2025-05-28 21:12:22 |
+|         7 | 佐藤としえ            | sato@gizumo.jp       |              2 |   35 |      2 | 2025-05-26 21:37:27 | 2025-05-28 21:12:50 |
+|         8 | 小林としこ            | kobayashi@gizumo.jp  |              2 |   24 |      2 | 2025-05-26 21:37:27 | 2025-05-28 21:13:04 |
+|         9 | 大森たつお            | omori@gizumo.jp      |              3 |   45 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:13:44 |
+|        10 | 柳沢だいご            | yanagisawa@gizumo.jp |              4 |   56 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:14:06 |
+|        11 | 大塚たく              | otsuka@gizumo.jp     |              5 |   50 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:14:22 |
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+
+10 rows in set (0.00 sec)
+
+＊departments,people,reportsの３つを紐付け。
+mysql> SELECT * FROM people INNER JOIN reports ON people.person_id = reports.person_id;
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+-----------+-----------+--------------------------------+---------------------+---------------------+
+| person_id | name                  | email                | departments_id | age  | gender | created_at          | updated_at          | report_id | person_id | content                        | created_at          | updated_at          |
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+-----------+-----------+--------------------------------+---------------------+---------------------+
+|         1 | 田中ゆうこ            | tanaka@gizumo.jp     |              1 |   25 |      2 | 2025-05-25 15:33:52 | 2025-05-28 20:54:01 |         1 |         1 | 10時から打ち合わせ             | 2025-05-25 18:59:12 | 2025-05-26 21:40:26 |
+|         2 | 福田だいすけ          | fukuda@gizumo.jp     |              1 |   42 |      1 | 2025-05-25 15:33:52 | 2025-05-28 21:07:19 |         2 |         2 | 報告書の提出                   | 2025-05-25 18:59:12 | 2025-05-26 21:41:15 |
+|         3 | 豊島はなこ            | toyoshima@gizumo.jp  |              1 |   34 |      2 | 2025-05-25 15:33:52 | 2025-05-28 21:07:47 |         3 |         3 | メールの一斉送信               | 2025-05-25 19:14:02 | 2025-05-26 21:42:02 |
+|         5 | 不思議沢みちこ        | NULL                 |              2 | NULL |   NULL | 2025-05-25 15:33:52 | 2025-05-28 21:11:47 |         5 |         5 | 11時から部課長会議             | 2025-05-25 19:31:51 | 2025-05-26 21:43:36 |
+|         6 | 鈴木たかし            | suzuki@gizumo.jp     |              2 |   20 |      1 | 2025-05-25 16:00:17 | 2025-05-28 21:12:22 |         6 |         6 | 履歴書のファイリング           | 2025-05-25 19:31:51 | 2025-05-26 21:49:15 |
+|         7 | 佐藤としえ            | sato@gizumo.jp       |              2 |   35 |      2 | 2025-05-26 21:37:27 | 2025-05-28 21:12:50 |         7 |         7 | 源泉徴収票の発送               | 2025-05-25 19:31:51 | 2025-05-26 21:49:55 |
+|         8 | 小林としこ            | kobayashi@gizumo.jp  |              2 |   24 |      2 | 2025-05-26 21:37:27 | 2025-05-28 21:13:04 |         8 |         8 | 請求書の作成                   | 2025-05-25 19:31:51 | 2025-05-26 21:50:33 |
+|         9 | 大森たつお            | omori@gizumo.jp      |              3 |   45 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:13:44 |         9 |         9 |                                | 2025-05-25 19:31:51 | 2025-05-26 21:51:19 |
+|        10 | 柳沢だいご            | yanagisawa@gizumo.jp |              4 |   56 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:14:06 |        10 |        10 | 消毒液の交換                   | 2025-05-25 19:31:51 | 2025-05-28 21:32:25 |
+|        11 | 大塚たく              | otsuka@gizumo.jp     |              5 |   50 |      1 | 2025-05-26 21:37:27 | 2025-05-28 21:14:22 |        11 |        11 | 15時からWEB面接                | 2025-05-25 19:14:02 | 2025-05-28 21:30:57 |
++-----------+-----------------------+----------------------+----------------+------+--------+---------------------+---------------------+-----------+-----------+--------------------------------+---------------------+---------------------+
+10 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q5　年齢の降順で男性の名前と年齢を取得。
+mysql> select name,age,gender 
+    -> from people where gender=1
+    -> order by age desc;
++--------------------+------+--------+
+| name               | age  | gender |
++--------------------+------+--------+
+| 柳沢だいご         |   56 |      1 |
+| 大塚たく           |   50 |      1 |
+| 大森たつお         |   45 |      1 |
+| 福田だいすけ       |   42 |      1 |
+| 鈴木たかし         |   20 |      1 |
++--------------------+------+--------+
+5 rows in set (0.01 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q6　テーブル・レコード・カラムという3つの単語を適切に使用して、下記のSQL文を日本語で説明。
+
+SELECT
+  `name`, `email`, `age`
+FROM
+  `people`
+WHERE
+  `department_id` = 1
+ORDER BY
+  `created_at`;
+
+説明:peopleテーブルから、departments_id=1に所属する人のname, email,ageのカラムを指定し、作成日時の昇順で取得した状態のレコードを表示させる。
+
+--------------------------------------------------------------------------------------------
+
+Q7　20代の女性と40代時男性の名前一覧を取得。
+mysql> SELECT name,age,gender
+    -> FROM people WHERE 20 <= age AND age < 30 and gender=2
+    -> or 40 <= age AND age < 50 and gender=1;
++--------------------+------+--------+
+| name               | age  | gender |
++--------------------+------+--------+
+| 田中ゆうこ         |   25 |      2 |
+| 福田だいすけ       |   42 |      1 |
+| 小林としこ         |   24 |      2 |
+| 大森たつお         |   45 |      1 |
++--------------------+------+--------+
+4 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q8 営業部に所属する人だけを年齢の昇順で取得。
+mysql> SELECT name,departments_id,age
+    -> from people where departments_id=1
+    -> order by age asc;
++--------------------+----------------+------+
+| name               | departments_id | age  |
++--------------------+----------------+------+
+| 田中ゆうこ         |              1 |   25 |
+| 豊島はなこ         |              1 |   34 |
+| 福田だいすけ       |              1 |   42 |
++--------------------+----------------+------+
+3 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q9 開発部に所属している女性の平均年齢を取得。
+mysql> SELECT AVG(age) AS average_age 
+    -> from people where departments_id=2 and gender=2;
++-------------+
+| average_age |
++-------------+
+|     29.5000 |
++-------------+
+1 row in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q10  名前と部署名とその人が提出した日報の内容を同時に取得。（日報を提出していない人は含めない）
+mysql> select name,departments_id,content
+    -> FROM people INNER JOIN reports ON people.person_id = reports.person_id
+    -> where content !='';
++-----------------------+----------------+--------------------------------+
+| name                  | departments_id | content                        |
++-----------------------+----------------+--------------------------------+
+| 田中ゆうこ            |              1 | 10時から打ち合わせ             |
+| 福田だいすけ          |              1 | 報告書の提出                   |
+| 豊島はなこ            |              1 | メールの一斉送信               |
+| 不思議沢みちこ        |              2 | 11時から部課長会議             |
+| 鈴木たかし            |              2 | 履歴書のファイリング           |
+| 佐藤としえ            |              2 | 源泉徴収票の発送               |
+| 小林としこ            |              2 | 請求書の作成                   |
+| 柳沢だいご            |              4 | 消毒液の交換                   |
+| 大塚たく              |              5 | 15時からWEB面接                |
++-----------------------+----------------+--------------------------------+
+9 rows in set (0.00 sec)
+
+--------------------------------------------------------------------------------------------
+
+Q11 日報を一つも提出していない人の名前一覧を取得。
+mysql> select name,content
+    -> FROM people INNER JOIN reports ON people.person_id = reports.person_id
+    ->  where content in ('');
++-----------------+---------+
+| name            | content |
++-----------------+---------+
+| 大森たつお      |         |
++-----------------+---------+
+1 row in set (0.00 sec)
+
+
+
